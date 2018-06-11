@@ -1,7 +1,14 @@
 var photos = [];
 var maxPhotos = 25;
 
+var similarPhotosItem = document.querySelector('#picture')
+  .content
+  .querySelector('.picture__img');
+
+
 var createPhotosItem = function (PhotosNumber) {
+
+  var photoElement = similarPhotosItem.cloneNode(true);
 
     //url, строка — адрес картинки вида photos/{{i}}.jpg, где {{i}} это ////число от 1 до 25. Адреса картинок не должны повторяться.
     for (var i = 1, i <= maxPhotos; i++) {
@@ -15,13 +22,6 @@ var createPhotosItem = function (PhotosNumber) {
     photosItem.likes = Math.floor(Math.random() * (maxLikes - minLikes + 1)) + minLikes;
 
     //comments, массив строк — список комментариев, оставленных другими пользователями к этой фотографии.
-    var comments = [];
-    var comment1 = 'Всё отлично!';
-    var comment2 = 'В целом всё неплохо. Но не всё.';
-    var comment3 = 'Когда вы делаете фотографию, хорошо бы убирать палец из кадра. В конце концов это просто непрофессионально.';
-    var comment4 = 'Моя бабушка случайно чихнула с фотоаппаратом в руках и у неё получилась фотография лучше.';
-    var comment5 = 'Я поскользнулся на банановой кожуре и уронил фотоаппарат на кота и у меня получилась фотография лучше.';
-    var comment6 = 'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!';
 
     for (var i = 0; i < comments.length; i++) {
       for (var j = 1; j < comments.length - 1; j++) {
@@ -46,5 +46,8 @@ var createPhotosItem = function (PhotosNumber) {
             }
           }
 
-          photosItem.description = description[Math.floor(Math.random() * description.length;
-            };
+          photosItem.description = description[Math.floor(Math.random() * description.length;};
+
+            //На основе данных, созданных в предыдущем пункте и шаблона #picture создайте DOM-элементы, соответствующие фотографиям и заполните их данными из массива: var similarPhotosItem = document.querySelector('#picture')
+            //.content
+            //.querySelector('.picture__img');
