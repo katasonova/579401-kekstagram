@@ -69,7 +69,7 @@ var getCommentsForPhoto = function (count) {
 
   for (var i = 0; i < count; i++) {
     result.push(COMMENTS[getRandomIntFromRange(COMMENT_MIN, COMMENT_MAX)]);
-  } 
+  }
   return result;
 };
 
