@@ -2,6 +2,18 @@
 
 var PHOTOS_COUNT = 25;
 
+var photoView = document.querySelector('.big-picture');
+photoView.classList.remove('hidden');
+
+var listItemComment = document.querySelector('.social__comment');
+listItemComment.classList.add('social__comment--text');
+
+var commentCountHide = document.querySelector('.social__comment-count');
+commentCountHide.classList.add('visually-hidden');
+
+var newCommentLoadHide = document.querySelector('.social__loadmore');
+newCommentLoadHide.classList.add('visually-hidden');
+
 var PHOTO_PATH = 'photos/';
 var PHOTO_EXTENSION = '.jpg';
 
@@ -35,6 +47,11 @@ var DESCRIPTION = [
 
 var DESCRIPTION_MIN = 0;
 var DESCRIPTION_MAX = DESCRIPTION.length - 1;
+
+var AVATAR = {
+  MIN: 1,
+  MAX: 6
+};
 
 var photoTemplate = document.querySelector('#picture').content;
 var picturesElement = document.querySelector('.pictures');
@@ -89,5 +106,15 @@ var renderPhotos = function (photos) {
 };
 
 var allPhotos = createPhotoObject();
-console.log(allPhotos);
 renderPhotos(allPhotos);
+
+var renderTargetPhoto = function (index) {
+  photoView.querySelector('.big-picture__img').src = allPhotos[index].url;
+  photoView.querySelector('.likes-count').textContent = allPhotos[index].likes;
+  photoView.querySelector('.comments-count').textContent = allPhotos[index].comments.length;
+  photoView.querySelector('social__picture').src = 'img/avatar-' + getRandomIntFromRange(AVATAR.MIN, AVATAR.MAX) + '.svg';
+  photoView.querySelector('social__text').textContent = allPhotos[index].comments;
+  photoView.querySelector('.social__caption').textContent = allPhotos[index].description;
+
+  return photoView;
+};
