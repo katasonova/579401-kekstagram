@@ -61,7 +61,7 @@ var getPhotoPath = function (numberOfPhoto) {
 };
 
 var getRandomIntFromRange = function (min, max) {
-  return  Math.floor(Math.random() * (max - min + 1) + min);
+  return Math.floor(Math.random() * (max - min + 1) + min);
 };
 
 var getCommentsForPhoto = function (count) {
@@ -70,14 +70,13 @@ var getCommentsForPhoto = function (count) {
   for (var i = 0; i < count; i++) {
     result.push(COMMENTS[getRandomIntFromRange(COMMENT_MIN, COMMENT_MAX)]);
   } 
-
   return result;
 };
 
 var createPhotoObject = function () {
   var result = [];
 
-  for (var i = 1; i <=  PHOTOS_COUNT; i++) {
+  for (var i = 1; i <= PHOTOS_COUNT; i++) {
     var newPhoto = {};
     newPhoto.url = getPhotoPath(i);
     newPhoto.likes = getRandomIntFromRange(LIKES.MIN, LIKES.MAX);
@@ -118,3 +117,5 @@ var renderTargetPhoto = function (index) {
 
   return photoView;
 };
+
+renderTargetPhoto(0);
