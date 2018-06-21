@@ -2,18 +2,6 @@
 
 var PHOTOS_COUNT = 25;
 
-var photoView = document.querySelector('.big-picture');
-photoView.classList.remove('hidden');
-
-var listItemComment = document.querySelector('.social__comment');
-listItemComment.classList.add('social__comment--text');
-
-var commentCountHide = document.querySelector('.social__comment-count');
-commentCountHide.classList.add('visually-hidden');
-
-var newCommentLoadHide = document.querySelector('.social__loadmore');
-newCommentLoadHide.classList.add('visually-hidden');
-
 var PHOTO_PATH = 'photos/';
 var PHOTO_EXTENSION = '.jpg';
 
@@ -52,6 +40,21 @@ var AVATAR = {
   MIN: 1,
   MAX: 6
 };
+
+var AVATAR_PATH = 'img/avatar-';
+var AVATAR_EXTENSION = '.svg';
+
+var photoView = document.querySelector('.big-picture');
+photoView.classList.remove('hidden');
+
+var listItemComment = big-picture.querySelector('.social__comment');
+listItemComment.classList.add('social__comment--text');
+
+var commentCountHide = big-picture.querySelector('.social__comment-count');
+commentCountHide.classList.add('visually-hidden');
+
+var newCommentLoadHide = big-picture.querySelector('.social__loadmore');
+newCommentLoadHide.classList.add('visually-hidden');
 
 var photoTemplate = document.querySelector('#picture').content;
 var picturesElement = document.querySelector('.pictures');
@@ -104,6 +107,10 @@ var renderPhotos = function (photos) {
   picturesElement.appendChild(documentFragment);
 };
 
+var getAvatarPath = function (numberOfAvatar) {
+  return AVATAR_PATH + numberOfAvatar + AVATAR_EXTENSION;
+};
+
 var allPhotos = createPhotoObject();
 renderPhotos(allPhotos);
 
@@ -111,8 +118,9 @@ var renderTargetPhoto = function (index) {
   photoView.querySelector('.big-picture__img').src = allPhotos[index].url;
   photoView.querySelector('.likes-count').textContent = allPhotos[index].likes;
   photoView.querySelector('.comments-count').textContent = allPhotos[index].comments.length;
-  photoView.querySelector('social__picture').src = 'img/avatar-' + getRandomIntFromRange(AVATAR.MIN, AVATAR.MAX) + '.svg';
+  photoView.querySelector('social__picture').src =  getAvatarPath(index);
   photoView.querySelector('social__text').textContent = allPhotos[index].comments;
+  photoView.querySelector('.social__comments').textContent = getCommentsForPhoto(index);
   photoView.querySelector('.social__caption').textContent = allPhotos[index].description;
 
   return photoView;
