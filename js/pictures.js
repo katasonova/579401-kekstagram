@@ -44,16 +44,18 @@ var AVATAR = {
 var AVATAR_PATH = 'img/avatar-';
 var AVATAR_EXTENSION = '.svg';
 
-var photoView = document.querySelector('.big-picture');
-photoView.classList.remove('hidden');
+var ESC_KEYCODE = 27;
 
-var listItemComment = big-picture.querySelector('.social__comment');
+var photoView = document.querySelector('.big-picture');
+// photoView.classList.remove('hidden');
+
+var listItemComment = photoView.querySelector('.social__comment');
 listItemComment.classList.add('social__comment--text');
 
-var commentCountHide = big-picture.querySelector('.social__comment-count');
+var commentCountHide = photoView.querySelector('.social__comment-count');
 commentCountHide.classList.add('visually-hidden');
 
-var newCommentLoadHide = big-picture.querySelector('.social__loadmore');
+var newCommentLoadHide = photoView.querySelector('.social__loadmore');
 newCommentLoadHide.classList.add('visually-hidden');
 
 var photoTemplate = document.querySelector('#picture').content;
@@ -118,7 +120,7 @@ var renderTargetPhoto = function (index) {
   photoView.querySelector('.big-picture__img').src = allPhotos[index].url;
   photoView.querySelector('.likes-count').textContent = allPhotos[index].likes;
   photoView.querySelector('.comments-count').textContent = allPhotos[index].comments.length;
-  photoView.querySelector('social__picture').src =  getAvatarPath(index);
+  //photoView.querySelector('social__picture').src = getAvatarPath(getRandomIntFromRange(AVATAR.MIN, AVATAR.MAX));
   photoView.querySelector('social__text').textContent = allPhotos[index].comments;
   photoView.querySelector('.social__comments').textContent = getCommentsForPhoto(index);
   photoView.querySelector('.social__caption').textContent = allPhotos[index].description;
@@ -127,3 +129,31 @@ var renderTargetPhoto = function (index) {
 };
 
 renderTargetPhoto(0);
+
+var photoUpload = document.querySelector('#upload-file');
+var imgUploadOverlay = document.querySelector('.img-upload__overlay');
+var photoUploadClose = imgUploadOverlay.querySelector('.upload-cancel');
+
+var escKeyboardButtonHandler = function(evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    closeChangePhotoForm();
+  }
+};
+
+var openChangePhotoForm = function () {
+  imgUploadOverlay.classList.remove('hidden');
+  document.addEventListener('keydown', escKeyboardButtonHandler);
+};
+
+var closeChangePhotoForm = function () {
+  imgUploadOverlay.classList.add('hidden');
+  document.removeEventListener('keydown', escKeyboardButtonHandler);
+};
+
+photoUpload.addEventListener('change', function() {
+  openChangePhotoForm();
+});
+
+photoUploadClose.addEventListener('click', function () {
+  closeChangePhotoForm();
+});
