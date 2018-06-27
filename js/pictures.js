@@ -46,6 +46,14 @@ var AVATAR_EXTENSION = '.svg';
 
 var ESC_KEYCODE = 'Escape';
 
+var PHOTO_EFFECTS = ['none', 'chrome', 'sepia', 'marvin', 'phobos', 'heat'];
+
+var HACHTAG = {
+  MAX_NUMBER: 5,
+  MAX_LENGTH: 20,
+  MIN_LENGTH: 2
+};
+
 var existBigPictureElement = document.querySelector('.big-picture');
 // existBigPictureElement.classList.remove('hidden');
 
@@ -96,6 +104,11 @@ var createPhotoObject = function () {
 
   return result;
 };
+ 
+var clickPhotoHandler = function (photoObject, evt) {
+  evt.preventDefault();
+  renderTargetPhoto(photoObject);
+};
 
 // отрисовка всех фотографий на страницу
 var renderPhotos = function (photos) {
@@ -107,20 +120,21 @@ var renderPhotos = function (photos) {
     newPhotoNode.querySelector('.picture__stat--likes').textContent = photos[i].likes;
     newPhotoNode.querySelector('.picture__stat--comments').textContent = photos[i].comments.length;
 
+    newPhotoNode.querySelector('.picture__link').addEventListener('click', clickPhotoHandler.bind(undefined, photos[i]));
+
     documentFragment.appendChild(newPhotoNode);
   }
 
   picturesElement.appendChild(documentFragment);
 };
 
+var getAvatarPath = function (numberOfAvatar) {
+  return AVATAR_PATH + numberOfAvatar + AVATAR_EXTENSION;
+};
 
 var allPhotos = createPhotoObject();
 renderPhotos(allPhotos);
 
-
-var getAvatarPath = function (numberOfAvatar) {
-  return AVATAR_PATH + numberOfAvatar + AVATAR_EXTENSION;
-};
 // .social__comments два раза нахожу элемент с этим классов один раз в функ renderTargetPhoto другой раз здесьпотому что нужна ссылка на объект
 // var existSocialCommentElement = existBigPictureElement.querySelector('.social__comments');
 var socialCommentElement = existBigPictureElement.querySelector('.social__comments');
@@ -175,6 +189,19 @@ var renderTargetPhoto = function (photoObject) {
   socialCommentElement.innerHTML = '';
   createSocialComments(socialCommentElement, photoObject.comments);
 
+  // Здесь поставь обработчик на закрытие по крестику, esc
+  bigPictureElementClone.querySelector('.big-picture__cancel').addEventListener('keydown', function (evt) {
+    if (evt.key === ESC_KEYCODE) {
+      bigPictureElementClone.classList.add('hidden');
+    }
+  });
+
+  bigPictureElementClone.querySelector('.big-picture__cancel').addEventListener('click', function (evt) {
+      bigPictureElementClone.classList.add('hidden');
+  });
+  
+  bigPictureElementClone.classList.remove('hidden');
+  
 
   mainContainer.appendChild(bigPictureElementClone);
 
@@ -182,6 +209,7 @@ var renderTargetPhoto = function (photoObject) {
 };
 
 
+// Загрузка изображения и показ формы редактирования
 var openChangePhotoForm = function () {
   imgUploadOverlay.classList.remove('hidden');
   document.addEventListener('keydown', escKeyboardButtonHandler);
@@ -216,108 +244,63 @@ var escKeyboardButtonHandler = function (evt) {
 };
 
 
-/*var clickPhotoHandler = function (photoObject, evt) {
-  evt.preventDefault();
-  renderTargetPhoto(photoObject);
-}
+// Применение эффекта для изображения
+// PHOTO_EFFECTS = ['none', 'chrome', 'sepia', 'marvin', 'phobos', 'heat'];
+var pictureEffectsRadio = document.querySelector('.effects__radio');
 
-var renderPhotos = function (photos) {
-  var documentFragment = document.createDocumentFragment();
+var imgUploadPreview = document.querySelector('.img-upload__preview').querySelector('img');
 
-  for (var i = 0; i < photos.length - 1; i++) {
-    var newPhotoNode = photoTemplate.cloneNode(true);
-    newPhotoNode.querySelector('.picture__img').src = photos[i].url;
-    newPhotoNode.querySelector('.picture__stat--likes').textContent = photos[i].likes;
-    newPhotoNode.querySelector('.picture__stat--comments').textContent = photos[i].comments.length;
+var getEffectForPhoto = function (effectName) {
 
-    newPhotoNode.querySelector('.picture__link').addEventListener('click', clickPhotoHandler.bind(undefined, photos[i]));
-
-    documentFragment.appendChild(newPhotoNode);
+  for (var i = 0; i <= effectName.length; i++) {
+    if (effectName[i] === 'chrome') {
+      imgUploadPreview.classList = '';
+      imgUploadPreview.classList.add('effects__preview--chrome');
+    } else if (effectName[i] === 'sepia') {
+      imgUploadPreview.classList = '';
+      imgUploadPreview.classList.add('effects__preview--sepia');
+    } else if (effectName[i] === 'marvin') {
+      imgUploadPreview.classList = '';
+      imgUploadPreview.classList.add('effects__preview--marvin');
+    } else if (effectName[i] === 'phobos') {
+      imgUploadPreview.classList = '';
+      imgUploadPreview.classList.add('effects__preview--phobos');
+      console.log('phobos');
+    } else if (effectName[i] === 'heat') {
+      imgUploadPreview.classList = '';
+      imgUploadPreview.classList.add('effects__preview--heat');
+      console.log('heat');
+    } else {
+      imgUploadPreview.classList = '';
+      imgUploadPreview.classList.add('effects__preview--none');
+      console.log('none');
+    }
   }
-
-  picturesElement.appendChild(documentFragment);
 };
 
-var getAvatarPath = function (numberOfAvatar) {
-  return AVATAR_PATH + numberOfAvatar + AVATAR_EXTENSION;
+var divScalePinMouseupHandler = function (evt) {
+  getEffectForPhoto(PHOTO_EFFECTS);
 };
 
-var allPhotos = createPhotoObject();
-renderPhotos(allPhotos);
+pictureEffectsRadio.addEventListener('click', divScalePinMouseupHandler);
 
-var createSocialComents = function (comments) {
-  var result = [];
 
-  for (var i = 0; i < comments.length; i++) {
-    var socialComment = document.createElement('li');
-    socialComment.className = 'social__comment';
+var scalePin = document.querySelector('.scale__pin');
+var scaleValue = document.querySelector('.scale__value');
 
-    var socialImg = document.createElement('img');
-    socialImg.src = '';
-    socialImg.className = 'social__picture';
 
-    socialComment.appendChild(socialImg);
+// Редактирование размера изображения ???
+var resizeControlMinus = document.querySelector('.resize__control--minu');
+var resizeControlPlus = document.querySelector('.resize__control--plus');
+var resizeControlValue = document.querySelector('.resize__control--value');
 
-    var socialText = document.createElement('p');
-    socialText.textContent = comments[i];
-    socialText.className = 'social__text';
-
-    socialComment.appendChild(socialText);
-
-    result.push(socialComment);
-  }
-
-  return result;
-}
-
-var renderTargetPhoto = function (photoObject) {
-  var existBigPictureElement = document.querySelector('.big-picture');
-  var bigPictureElement = existBigPictureElement.cloneNode(true);
-
-  mainContainer.removeChild(existBigPictureElement);
-
-  bigPictureElement.querySelector('.big-picture__img').querySelector('img').src = photoObject.url;
-  bigPictureElement.querySelector('.likes-count').textContent = photoObject.likes;
-  bigPictureElement.querySelector('.comments-count').textContent = photoObject.comments.length;
-  bigPictureElement.querySelector('.social__picture').src = getAvatarPath(getRandomIntFromRange(AVATAR.MIN, AVATAR.MAX));
-  // photoView.querySelector('social__text').textContent = photoObject.comments;
-  bigPictureElement.querySelector('.social__caption').textContent = photoObject.description;
-  var socialCommentElement = bigPictureElement.querySelector('.social__comments');
-
-  // Здесь поставь обработчик на закрытие по крестику, esc
-  bigPictureElement.querySelector('.big-picture__cancel').addEventListener('click', function (evt) {
-    bigPictureElement.classList.add('hidden');
-  });
-
-  bigPictureElement.classList.remove('hidden');
-
-  mainContainer.appendChild(bigPictureElement);
-
-  return photoView;
+var resizePhoto = fucntion () {
 };
 
-var openChangePhotoForm = function () {
-  imgUploadOverlay.classList.remove('hidden');
-  document.addEventListener('keydown', escKeyboardButtonHandler);
-};
-// renderTargetPhoto(allPhotos[0]);
-
-var photoUpload = document.querySelector('#upload-file');
-
-photoUpload.addEventListener('change', openChangePhotoForm);
-
-var imgUploadOverlay = document.querySelector('.img-upload__overlay');
-var photoUploadClose = imgUploadOverlay.querySelector('#upload-cancel');
-
-var closeChangePhotoForm = function () {
-  imgUploadOverlay.classList.add('hidden');
-  document.removeEventListener('keydown', escKeyboardButtonHandler);
+var resizeControlClickHandler = function (evt) {
 };
 
-photoUploadClose.addEventListener('click', closeChangePhotoForm);
+resizeControlMinus.addEventListener('click', resizeControlClickHandler);
+resizeControlPlus.addEventListener('click', resizeControlClickHandler);
 
-var escKeyboardButtonHandler = function (evt) {
-  if (evt.key === ESC_KEYCODE) {
-    closeChangePhotoForm();
-  }
-};*/
+resizeControlValue.addEventListener('change', );
