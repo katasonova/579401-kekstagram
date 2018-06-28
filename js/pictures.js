@@ -268,34 +268,59 @@ var scalePin = document.querySelector('.scale__pin');
 var scaleValue = document.querySelector('.scale__value');
 
 
-// Редактирование размера изображения ???
+// Редактирование размера изображения
+
+//buttons
 var resizeControlMinus = document.querySelector('.resize__control--minu');
 var resizeControlPlus = document.querySelector('.resize__control--plus');
+//input.value readonly
 var resizeControlValue = document.querySelector('.resize__control--value');
+var resizeValueNumber = parseInt(resizeControlValue.value, 10);
+
+var RESIZE_INITIAL = 100;
+// var scaleCurrent = 100;
+var RESIZE_STEP = 25;
+var RESIZE_MIN = 25;
+var RESIZE_MAX = 100;
 
 
-var INITIAL_SCALE = 100;
-var currentScale = 100;
-
-var setDefaultScale = function () {
-  // Применить масштаб по умолчанию
-  // setScale (100)
+// Применить масштаб по умолчанию
+// setDefaultSize (100)
+var setDefaultSize = function (valueNumber) {
+  resizeControlValue.value = valueNumber + '%';
+  return resizeControlValue;
 };
 
-var setScale = function (newScale) {
-  // Найти изображение
+var resizeDefault = setDefaultSize (RESIZE_INITIAL);
+
+var setSize = function (newSize) {
+    // Найти изображение
   // Применить фильтр для 100%
+  var scaleNumber = (parseInt(newSize, 10)) / 100;
+  imgUploadPreview.style.transform = 'scale(scaleNumber)';
+  // не устанавливается значение value для input
+  imgUploadPreview.value = scaleNumber + '%';
+  return imgUploadPreview;
 };
+
+setSize(resizeDefault)
+console.log(imgUploadPreview);
 
 // Обработка клика
 // currentScale - 25 или прибавляем
-// var resizePhoto = function () {
-// };
+ var resizeControlPlusHandler = function (evt) {
+  if (evt.currentTargen.value > RESIZE_MIN) {
+    resizeValueNumber -= RESIZE_STEP;
+    setSize(resizeValueNumber);
+  } 
+};
 
-// var resizeControlClickHandler = function (evt) {
-// };
+var resizeControlMinusHandler = function (evt) {
+  if (evt.currentTargen.value < RESIZE_MAX) {
+    resizeValueNumber += RESIZE_STEP;
+    setSize(resizeValueNumber);
+  } 
+};
 
-// resizeControlMinus.addEventListener('click', resizeControlClickHandler);
-// resizeControlPlus.addEventListener('click', resizeControlClickHandler);
-
-// resizeControlValue.addEventListener('change', );
+resizeControlMinus.addEventListener('click', resizeControlMinusHandler);
+resizeControlPlus.addEventListener('click', resizeControlPlusHandler);
