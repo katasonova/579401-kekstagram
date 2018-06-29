@@ -46,12 +46,6 @@ var AVATAR_EXTENSION = '.svg';
 
 var ESC_KEYCODE = 'Escape';
 
-var HACHTAG = {
-  MAX_NUMBER: 5,
-  MAX_LENGTH: 20,
-  MIN_LENGTH: 2
-};
-
 var existBigPictureElement = document.querySelector('.big-picture');
 // existBigPictureElement.classList.remove('hidden');
 
@@ -275,7 +269,7 @@ var resizeControlMinus = document.querySelector('.resize__control--minu');
 var resizeControlPlus = document.querySelector('.resize__control--plus');
 //input.value readonly
 var resizeControlValue = document.querySelector('.resize__control--value');
-var resizeValueNumber = parseInt(resizeControlValue.value, 10);
+var currentScaleValue = parseInt(resizeControlValue.value, 10);
 
 var RESIZE_INITIAL = 100;
 // var scaleCurrent = 100;
@@ -296,10 +290,12 @@ var resizeDefault = setDefaultSize (RESIZE_INITIAL);
 var setSize = function (newSize) {
     // Найти изображение
   // Применить фильтр для 100%
-  var scaleNumber = (parseInt(newSize, 10)) / 100;
-  imgUploadPreview.style.transform = 'scale(scaleNumber)';
+  var value = parseInt(resizeControlValue.value, 10); 
+  var transformValue = value / 100; 
+  imgUploadPreview.style.transform = 'scale(' + transformValue + ')';
+  // imgUploadPreview.style.transform = 'scale(scaleNumber)';
   // не устанавливается значение value для input
-  imgUploadPreview.value = scaleNumber + '%';
+  imgUploadPreview.value = transformValue + '%';
   return imgUploadPreview;
 };
 
@@ -324,3 +320,54 @@ var resizeControlMinusHandler = function (evt) {
 
 resizeControlMinus.addEventListener('click', resizeControlMinusHandler);
 resizeControlPlus.addEventListener('click', resizeControlPlusHandler);
+
+
+// Валидация хэштэгов
+
+var HACHTAG = {
+  MAX_NUMBER: 5,
+  MAX_LENGTH: 20,
+  MIN_LENGTH: 2
+};
+
+var hashtagInput = document.querySelector('.text__hashtags');
+
+var getHashtagArray = function () {
+  var hashtagArray = hashtagInput.value.split(' ');
+  return hashtagArray;
+};
+
+hashtagInput.addEventListener('invalid', function (evt) {
+  for (var i = 0; i < hashtagArray.length - 1; i++) {
+    hashtagArray[i].toLowerCase();
+    if (hashtagArray[i].charAt !== '#') {
+      hashtagInput.setCustomValidity('Хэш-тег начинается с символа #');
+    } else if (hashtagArray[i].length < HACHTAG.MIN_LENGTH) {
+      hashtagInput.setCustomValidity('Хеш-тег не может состоять только из одной решётки');
+    } else if (hashtagArray[i].length > HACHTAG.MAX_LENGTH) {
+      hashtagInput.setCustomValidity('Mаксимальная длина одного хэш-тега 20 символов, включая решётку');
+    } else if (hashtagArray.length > HACHTAG.MAX_NUMBER) {
+      hashtagInput.setCustomValidity('Нельзя указать больше пяти хэш-тегов');
+    } else {
+      hashtagInput.setCustomValidity('');
+    }
+    // один и тот же хэш-тег не может быть использован дважды;
+    for (var j = 0; j < hashtagArray.length - 1; j++) {
+      if (hashtagArray[i] === hashtagArray[j]) {
+        hashtagInput.setCustomValidity('Один и тот же хэш-тег не может быть использован дважды');
+        // хэш-теги разделяются пробелами; не понимаю как это реализовать
+      } else if (!(hashtagArray[i] + ' ' + hashtagArray[j])) {
+        hashtagInput.setCustomValidity('Хэш-теги должны быть разделены пробелами');
+      };
+    }
+  };
+});
+
+// если фокус находится в поле ввода хэш-тега, нажатие на Esc не должно приводить к закрытию формы редактирования изображения.
+hashtagInput.addEventListener('focus', function () {
+  document.removeEventListener('keydown', escKeyboardButtonHandler);
+});
+
+hashtagInput.addEventListener('focusout', function () {
+  document.removeEventListener('keydown', escKeyboardButtonHandler);
+});
