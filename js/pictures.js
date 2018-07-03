@@ -265,7 +265,7 @@ var scaleValue = document.querySelector('.scale__value');
 // Редактирование размера изображения
 
 //buttons
-var resizeControlMinus = document.querySelector('.resize__control--minu');
+var resizeControlMinus = document.querySelector('.resize__control--minus');
 var resizeControlPlus = document.querySelector('.resize__control--plus');
 //input.value readonly
 var resizeControlValue = document.querySelector('.resize__control--value');
@@ -300,7 +300,7 @@ var setSize = function (newSize) {
 };
 
 setSize(resizeDefault)
-console.log(imgUploadPreview);
+// console.log(imgUploadPreview);
 
 // Обработка клика
 // currentScale - 25 или прибавляем
@@ -323,6 +323,17 @@ resizeControlPlus.addEventListener('click', resizeControlPlusHandler);
 
 
 // Валидация хэштэгов
+
+var imgFiltersForm = document.querySelector('.img-filters__form');
+imgFiltersForm.method = 'post';
+imgFiltersForm.enctype = 'multipart/form-data';
+imgFiltersForm.action = 'https://js.dump.academy/kekstagram';
+imgFiltersForm.autocomplete = 'off';
+
+// method="post"
+// enctype="multipart/form-data"
+// action="https://js.dump.academy/code-and-magick"
+// autocomplete="off"
 
 var HACHTAG = {
   MAX_NUMBER: 5,
@@ -371,3 +382,9 @@ hashtagInput.addEventListener('focus', function () {
 hashtagInput.addEventListener('focusout', function () {
   document.removeEventListener('keydown', escKeyboardButtonHandler);
 });
+
+
+// верстку произвольного блока
+
+var ajaxBlock = document.createElement('p');
+mainContainer.appendChild(ajaxBlock);
