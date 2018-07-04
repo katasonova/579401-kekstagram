@@ -264,63 +264,31 @@ var scaleValue = document.querySelector('.scale__value');
 
 // Редактирование размера изображения
 
-//buttons
-var resizeControlMinus = document.querySelector('.resize__control--minus');
-var resizeControlPlus = document.querySelector('.resize__control--plus');
-//input.value readonly
-var resizeControlValue = document.querySelector('.resize__control--value');
-var currentScaleValue = parseInt(resizeControlValue.value, 10);
+function () {
 
-var RESIZE_INITIAL = 100;
-// var scaleCurrent = 100;
-var RESIZE_STEP = 25;
-var RESIZE_MIN = 25;
-var RESIZE_MAX = 100;
+  var uploadFormElement = document.querySelector('.img-upload__form');
+  var buttonDecElement = uploadFormElement.querySelector('.resize__control--minus');
+  var buttonIncElement = uploadFormElement.querySelector('.resize__control--plus');
+  var uploadPreviewElement = uploadFormElement.querySelector('.img-upload__preview');
+  var resizeControlElement = uploadFormElement.querySelector('.resize__control--value');
 
+  buttonDecElement.addEventListener('click', function () {
+    var currentValue = parseInt(resizeControlElement.value, 10);
+    var newValue = Math.max(window.constants.SCALE_LIMIT_MIN, currentValue - window.constants.SCALE_STEP_VALUE);
 
-// Применить масштаб по умолчанию
-// setDefaultSize (100)
-var setDefaultSize = function (valueNumber) {
-  resizeControlValue.value = valueNumber + '%';
-  return resizeControlValue;
-};
+    resizeControlElement.value = newValue + '%';
+    uploadPreviewElement.style.transform = 'scale(' + newValue / 100 + ')';
+  });
 
-var resizeDefault = setDefaultSize (RESIZE_INITIAL);
+  buttonIncElement.addEventListener('click', function () {
+    var currentValue = parseInt(resizeControlElement.value, 10);
+    var newValue = Math.min(window.constants.SCALE_LIMIT_MAX, currentValue + window.constants.SCALE_STEP_VALUE);
 
-var setSize = function (newSize) {
-    // Найти изображение
-  // Применить фильтр для 100%
-  var value = parseInt(resizeControlValue.value, 10); 
-  var transformValue = value / 100; 
-  imgUploadPreview.style.transform = 'scale(' + transformValue + ')';
-  // imgUploadPreview.style.transform = 'scale(scaleNumber)';
-  // не устанавливается значение value для input
-  imgUploadPreview.value = transformValue + '%';
-  return imgUploadPreview;
-};
+    resizeControlElement.value = newValue + '%';
+    uploadPreviewElement.style.transform = 'scale(' + newValue / 100 + ')';
+  });
 
-setSize(resizeDefault)
-// console.log(imgUploadPreview);
-
-// Обработка клика
-// currentScale - 25 или прибавляем
- var resizeControlPlusHandler = function (evt) {
-  if (evt.currentTargen.value > RESIZE_MIN) {
-    resizeValueNumber -= RESIZE_STEP;
-    setSize(resizeValueNumber);
-  } 
-};
-
-var resizeControlMinusHandler = function (evt) {
-  if (evt.currentTargen.value < RESIZE_MAX) {
-    resizeValueNumber += RESIZE_STEP;
-    setSize(resizeValueNumber);
-  } 
-};
-
-resizeControlMinus.addEventListener('click', resizeControlMinusHandler);
-resizeControlPlus.addEventListener('click', resizeControlPlusHandler);
-
+}
 
 // Валидация хэштэгов
 
