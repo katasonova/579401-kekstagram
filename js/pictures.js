@@ -288,71 +288,67 @@ function () {
     uploadPreviewElement.style.transform = 'scale(' + newValue / 100 + ')';
   });
 
-}
+};
 
 // Валидация хэштэгов
 
-var imgFiltersForm = document.querySelector('.img-filters__form');
-imgFiltersForm.method = 'post';
-imgFiltersForm.enctype = 'multipart/form-data';
-imgFiltersForm.action = 'https://js.dump.academy/kekstagram';
-imgFiltersForm.autocomplete = 'off';
+function () {
 
-// method="post"
-// enctype="multipart/form-data"
-// action="https://js.dump.academy/code-and-magick"
-// autocomplete="off"
-
-var HACHTAG = {
-  MAX_NUMBER: 5,
-  MAX_LENGTH: 20,
-  MIN_LENGTH: 2
-};
-
-var hashtagInput = document.querySelector('.text__hashtags');
-
-var getHashtagArray = function () {
-  var hashtagArray = hashtagInput.value.split(' ');
-  return hashtagArray;
-};
-
-hashtagInput.addEventListener('invalid', function (evt) {
-  for (var i = 0; i < hashtagArray.length - 1; i++) {
-    hashtagArray[i].toLowerCase();
-    if (hashtagArray[i].charAt !== '#') {
-      hashtagInput.setCustomValidity('Хэш-тег начинается с символа #');
-    } else if (hashtagArray[i].length < HACHTAG.MIN_LENGTH) {
-      hashtagInput.setCustomValidity('Хеш-тег не может состоять только из одной решётки');
-    } else if (hashtagArray[i].length > HACHTAG.MAX_LENGTH) {
-      hashtagInput.setCustomValidity('Mаксимальная длина одного хэш-тега 20 символов, включая решётку');
-    } else if (hashtagArray.length > HACHTAG.MAX_NUMBER) {
-      hashtagInput.setCustomValidity('Нельзя указать больше пяти хэш-тегов');
-    } else {
-      hashtagInput.setCustomValidity('');
-    }
-    // один и тот же хэш-тег не может быть использован дважды;
-    for (var j = 0; j < hashtagArray.length - 1; j++) {
-      if (hashtagArray[i] === hashtagArray[j]) {
-        hashtagInput.setCustomValidity('Один и тот же хэш-тег не может быть использован дважды');
-        // хэш-теги разделяются пробелами; не понимаю как это реализовать
-      } else if (!(hashtagArray[i] + ' ' + hashtagArray[j])) {
-        hashtagInput.setCustomValidity('Хэш-теги должны быть разделены пробелами');
-      };
-    }
+  var Errors = {
+    HASHTAGS_TOO_MUCH: 'У вас слишком много хэштегов, можно не больше 5',
+    HASHTAG_HAS_NO_HASH: 'Каждый хэштег должен начинаться с символа #',
+    HASHTAG_TOO_LONG: 'Хэштег не должен быть длиннее 20 символов',
+    HASHTAG_ONLY_HASH: 'Хэштег не должен состоять только из одной #',
+    HASHTAG_HAS_DOUBLE: 'Пожалуйста, уберите повторяющийся хэштег'
   };
-});
 
-// если фокус находится в поле ввода хэш-тега, нажатие на Esc не должно приводить к закрытию формы редактирования изображения.
-hashtagInput.addEventListener('focus', function () {
-  document.removeEventListener('keydown', escKeyboardButtonHandler);
-});
-
-hashtagInput.addEventListener('focusout', function () {
-  document.removeEventListener('keydown', escKeyboardButtonHandler);
-});
+  var uploadFormElement = document.querySelector('.img-upload__form');
+  var hashtagInputElement = uploadFormElement.querySelector('.text__hashtags');
 
 
-// верстку произвольного блока
+  var validateHashtags = function () {
+    var hashtags = hashtagInputElement.value.toLowerCase().trim();
+    var hashtagsForTest = hashtags.split(' ');
+    var doubleHashtags = [];
+    var testDoubleHashtags = [];
+    hashtagInputElement.setCustomValidity('');
 
-var ajaxBlock = document.createElement('p');
-mainContainer.appendChild(ajaxBlock);
+    if (hashtags === '') {
+      return;
+    }
+
+    if (hashtagsForTest.length > window.constants.HASHTAGS_MAX_QUANTITY) {
+      hashtagInputElement.setCustomValidity(Errors.HASHTAGS_TOO_MUCH);
+      return;
+    }
+
+    for (var i = 0; i < hashtagsForTest.length; i++) {
+      if (hashtagsForTest[i].charAt(0) !== window.constants.HASHTAG_SYMBOL) {
+        return hashtagInputElement.setCustomValidity(Errors.HASHTAG_HAS_NO_HASH);
+      }
+
+      if (hashtagsForTest[i].length > window.constants.HASHTAG_MAX_LENGTH) {
+        return hashtagInputElement.setCustomValidity(Errors.HASHTAG_TOO_LONG);
+      }
+
+      if (hashtagsForTest[i] === window.constants.HASHTAG_SYMBOL) {
+        return hashtagInputElement.setCustomValidity(Errors.HASHTAG_ONLY_HASH);
+      }
+
+      if (testDoubleHashtags.includes(hashtagsForTest[i]) && !doubleHashtags.includes(hashtagsForTest[i])) {
+        doubleHashtags.push(hashtagsForTest[i]);
+      } else {
+        testDoubleHashtags.push(hashtagsForTest[i]);
+      }
+    }
+
+    if (doubleHashtags.length > 0) {
+      return hashtagInputElement.setCustomValidity(Errors.HASHTAG_HAS_DOUBLE);
+    }
+
+  };
+
+  hashtagInputElement.addEventListener('keyup', validateHashtags);
+
+
+};
