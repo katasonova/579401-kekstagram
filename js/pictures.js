@@ -261,6 +261,201 @@ pictureEffectsRadio.forEach(function (it) {
 var scalePin = document.querySelector('.scale__pin');
 var scaleValue = document.querySelector('.scale__value');
 
+function () {
+
+  var EffectsList = {
+    DEFAULT: 'none',
+    CHROME: 'chrome',
+    SEPIA: 'sepia',
+    MARVIN: 'marvin',
+    PHOBOS: 'phobos',
+    HEAT: 'heat'
+  };
+
+  var applyPinPositionToEffect = function (pinLeftPosition, effectIntensity, scrollBarWidth) {
+    if (pinLeftPosition < window.constants.PIN_WIDTH / 2) {
+      pinLeftPosition = window.constants.PIN_WIDTH / 2;
+    } else if (pinLeftPosition > scrollBarWidth - window.constants.PIN_WIDTH / 2) {
+      pinLeftPosition = scrollBarWidth - window.constants.PIN_WIDTH / 2;
+    }
+
+    scaleValueInputElement.value = effectIntensity;
+    scalePinElement.style.left = pinLeftPosition + 'px';
+    previewElement.style.filter = createStyleEffect(currentEffect, window.constants.TYPE_EFFECT_CUSTOM);
+    scaleBarElement.style.width = effectIntensity + '%';
+  };
+
+  var keyDownHandler = function (downEvt) {
+
+    var scrollBarWidth = caclulateScrollBarWidth();
+    var scrollBarCoordX = (windowWidth - scrollBarWidth) / 2;
+    var pinLeftPosition;
+
+    if (downEvt.key === window.constants.KEYCODE_LEFT) {
+      pinLeftPosition = scalePinElement.offsetLeft - window.constants.PIN_SCROLL_STEP;
+    }
+    if (downEvt.key === window.constants.KEYCODE_RIGHT) {
+      pinLeftPosition = scalePinElement.offsetLeft + window.constants.PIN_SCROLL_STEP;
+    }
+
+    updateEffectIntensity(pinLeftPosition + scrollBarCoordX);
+    applyPinPositionToEffect(pinLeftPosition, effectIntensity, scrollBarWidth);
+  };
+
+  var mouseDownHandler = function (downEvt) {
+    downEvt.preventDefault();
+
+    var startCoordX = downEvt.clientX;
+
+    var mouseMoveHandler = function (moveEvt) {
+      moveEvt.preventDefault();
+
+      var scrollBarWidth = caclulateScrollBarWidth();
+      var shiftX = startCoordX - moveEvt.clientX;
+      var scrollBarCoordX = (windowWidth - scrollBarWidth) / 2;
+      var pinLeftPosition = scalePinElement.offsetLeft - shiftX;
+
+      if (moveEvt.clientX < scrollBarCoordX) {
+        startCoordX = scrollBarCoordX;
+      } else if (moveEvt.clientX > scrollBarCoordX + scrollBarWidth) {
+        startCoordX = scrollBarCoordX + scrollBarWidth;
+      } else {
+        startCoordX = moveEvt.clientX;
+      }
+
+      updateEffectIntensity(startCoordX);
+      applyPinPositionToEffect(pinLeftPosition, effectIntensity, scrollBarWidth);
+    };
+
+    var mouseUpHandler = function (upEvt) {
+      upEvt.preventDefault();
+
+      document.removeEventListener('mousemove', mouseMoveHandler);
+      document.removeEventListener('mouseup', mouseUpHandler);
+    };
+
+    document.addEventListener('mousemove', mouseMoveHandler);
+    document.addEventListener('mouseup', mouseUpHandler);
+  };
+
+  var createEffectClickHandler = function (effectName) {
+    return function () {
+      currentEffect = effectName;
+
+      previewElement.className = 'img-upload__preview effects__preview--' + effectName;
+
+      if (effectName === EffectsList.DEFAULT) {
+        scaleElement.classList.add('hidden');
+      } else {
+        scaleElement.classList.remove('hidden');
+      }
+
+      previewElement.style.filter = createStyleEffect(effectName, window.constants.TYPE_EFFECT_DEFAULT);
+      scalePinElement.style.left = caclulateScrollBarWidth() - window.constants.PIN_WIDTH / 2 + 'px';
+      scaleBarElement.style.width = 100 + '%';
+    };
+  };
+
+  var createGreyScaleStyle = function (effectType) {
+    if (effectType !== window.constants.TYPE_EFFECT_CUSTOM) {
+      return 'grayscale(' + window.constants.EFFECT_GRAYSCALE_DEFAULT_VALUE + ')';
+    }
+    return 'grayscale(' + effectIntensity / 100 + ')';
+  };
+
+  var createSepiaStyle = function (effectType) {
+    if (effectType !== window.constants.TYPE_EFFECT_CUSTOM) {
+      return 'sepia(' + window.constants.EFFECT_SEPIA_DEFAULT_VALUE + ')';
+    }
+    return 'sepia(' + effectIntensity / 100 + ')';
+  };
+
+  var createInvertStyle = function (effectType) {
+    if (effectType !== window.constants.TYPE_EFFECT_CUSTOM) {
+      return 'invert(' + window.constants.EFFECT_INVERT_DEFAULT_VALUE + '%)';
+    }
+    return 'invert(' + effectIntensity + '%)';
+  };
+
+  var createBlurStyle = function (effectType) {
+    if (effectType !== window.constants.TYPE_EFFECT_CUSTOM) {
+      return 'blur(' + window.constants.EFFECT_BLUR_DEFAULT_VALUE + 'px)';
+    }
+    return 'blur(' + effectIntensity * window.constants.EFFECT_BLUR_RATIO + 'px)';
+  };
+
+  var createBrightnessStyle = function (effectType) {
+    if (effectType !== window.constants.TYPE_EFFECT_CUSTOM) {
+      return 'brightness(' + window.constants.EFFECT_BRIGHTNESS_DEFAULT_VALUE + ')';
+    }
+    return 'brightness(' + (effectIntensity * window.constants.EFFECT_BRIGHTNESS_RATIO + 1) + ')';
+  };
+
+  var createStyleEffect = function (effect, effectType) {
+    switch (effect) {
+      case EffectsList.CHROME:
+        return createGreyScaleStyle(effectType);
+      case EffectsList.SEPIA:
+        return createSepiaStyle(effectType);
+      case EffectsList.MARVIN:
+        return createInvertStyle(effectType);
+      case EffectsList.PHOBOS:
+        return createBlurStyle(effectType);
+      case EffectsList.HEAT:
+        return createBrightnessStyle(effectType);
+      default:
+        return EffectsList.DEFAULT;
+    }
+  };
+
+  var caclulateScrollBarWidth = function () {
+    return scaleLineElement.getBoundingClientRect().width;
+  };
+
+  var updateEffectIntensity = function (value) {
+    var scrollBarWidth = caclulateScrollBarWidth();
+    var pinPosition = value - (windowWidth - scrollBarWidth) / 2;
+
+    effectIntensity = Math.floor(pinPosition / (scrollBarWidth / 100));
+
+    if (effectIntensity < 0) {
+      effectIntensity = 0;
+    } else if (effectIntensity > 100) {
+      effectIntensity = 100;
+    }
+  };
+
+  var uploadFormElement = document.querySelector('.img-upload__form');
+  var previewElement = uploadFormElement.querySelector('.img-upload__preview');
+  var effectElement = uploadFormElement.querySelectorAll('.effects__radio');
+  var scalePinElement = uploadFormElement.querySelector('.scale__pin');
+  var scaleValueInputElement = uploadFormElement.querySelector('.scale__value');
+  var scaleElement = uploadFormElement.querySelector('.img-upload__scale');
+  var scaleLineElement = uploadFormElement.querySelector('.scale__line');
+  var scaleBarElement = uploadFormElement.querySelector('.scale__level');
+  var windowWidth = document.documentElement.clientWidth;
+
+  var currentEffect;
+  var effectIntensity;
+
+  scalePinElement.addEventListener('mousedown', mouseDownHandler);
+
+  scalePinElement.addEventListener('focus', function () {
+    scalePinElement.addEventListener('keydown', keyDownHandler);
+  });
+
+  scalePinElement.addEventListener('focusout', function () {
+    scalePinElement.removeEventListener('keydown', keyDownHandler);
+  });
+
+  scaleElement.classList.add('hidden');
+
+  Object.values(EffectsList).forEach(function (item, index) {
+    effectElement[index].addEventListener('click', createEffectClickHandler(item));
+  });
+
+};
+
 
 // Редактирование размера изображения
 
